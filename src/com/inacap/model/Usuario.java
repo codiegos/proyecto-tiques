@@ -3,15 +3,17 @@ package com.inacap.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author leand
+ * @author diego
  */
 public class Usuario {
 
+    public int id;
     public String nombre;
     public String username;
     public String password;
@@ -29,6 +31,17 @@ public class Usuario {
         this.password = password;
         this.idTipoUsuario = idTipoUsuario;
 
+    }
+
+    public Usuario(int id, String nombre, String username, int idTipoUsuario) {
+        this.id = id;
+        this.nombre = nombre;
+        this.username = username;
+        this.idTipoUsuario = idTipoUsuario;
+    }
+
+    public Usuario() {
+        
     }
     
     
@@ -76,6 +89,51 @@ public class Usuario {
             estado = sentencia.executeUpdate();
             
         } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        return estado;
+    }
+        
+         public static ArrayList<Usuario> consultarUsuarios() {
+        ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+        try {
+            ConexionBD c = new ConexionBD();
+            String sql = "SELECT * FROM usuario";
+            PreparedStatement sentencia = c.conn.prepareStatement(sql);
+            ResultSet resultado = sentencia.executeQuery();
+            
+            while (resultado.next()) {
+                Usuario user = new Usuario();
+                user.id = resultado.getInt("id");
+                user.nombre = resultado.getString("nombre");
+                user.username = resultado.getString("username");
+                user.idTipoUsuario = resultado.getInt("idTipoUsuario");
+                
+                listaUsuarios.add(user);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        return listaUsuarios;
+    }
+         
+        public int actualizar() {
+        int estado = 0;
+        try {
+            ConexionBD c = new ConexionBD();
+            String sql = "UPDATE usuario SET nombre = ? WHERE id = ?";
+            PreparedStatement sentencia = c.conn.prepareStatement(sql);
+            sentencia.setString(1, nombre);
+            sentencia.setInt(2, id);
+
+            estado = sentencia.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         
